@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import BusRoutePage from './BusRoutePage';
 import reittiopas from './reittiopas.json';
+import { Grid, makeStyles } from '@material-ui/core';
 
 function App() {
   const busStops = reittiopas.pysakit;
@@ -11,6 +12,7 @@ function App() {
 
   return (
     <div className="App">
+      {/* <Grid container spacing={3}> */}
       {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
@@ -26,6 +28,7 @@ function App() {
         </a>
       </header> */}
       <BusRoutePage busStops={busStops} busRoads={busRoads} busRoutes={busRoutes}></BusRoutePage>
+      {/* </Grid> */}
     </div>
   );
 }

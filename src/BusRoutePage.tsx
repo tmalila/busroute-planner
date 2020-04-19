@@ -1,5 +1,7 @@
 import React, { FunctionComponent, useState } from "react";
 import StopSelector from "./components/StopSelector";
+import { makeStyles, Theme, createStyles, Grid, Button } from "@material-ui/core";
+import RouteList from "./components/RouteList";
 
 export interface RoadType {
   mista: string,
@@ -29,12 +31,25 @@ export interface Vertex {
   routeColor?: string,
 }
 
-
 interface Props {
   busStops: string[],
   busRoads: RoadType[],
   busRoutes: RoutesType,
 }
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      flexGrow: 1,
+      padding: "1rem",
+    },
+    paper: {
+      padding: theme.spacing(2),
+      textAlign: 'center',
+      color: theme.palette.text.secondary,
+    },
+  }),
+);
 
 const BusRoutePage: FunctionComponent<Props> = props => {
 
@@ -43,7 +58,9 @@ const BusRoutePage: FunctionComponent<Props> = props => {
   const [startStop, setStartStop] = useState("");
   const [queriedRoute, setQueriedRoute] = useState<Vertex[]>([]);
 
-  const aStarSearch = (start: string, end: string) => {
+  const classes = useStyles();
+
+  const dijkstraSearch = (start: string, end: string) => {
 
     let resultTable:Vertex[] = []; // Key A -> Shortest distance from a, previous node
     let visitedNodes: string[] = [];
@@ -235,32 +252,39 @@ const BusRoutePage: FunctionComponent<Props> = props => {
   }
 
 
-  const handleEndStopChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleEndStopChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     var target = e.target as HTMLSelectElement;
     setEndStop(target.value);
   }
 
-  const handleStartStopChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleStartStopChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     var target = e.target as HTMLSelectElement;
     setStartStop(target.value);
   }
 
   const { busStops } = props;
   return (
-    <div>
+    <div className={classes.root}>
       <h2>Hello busroutepage</h2>
       <h4>Selected start: {startStop}</h4>
       <h4>Selected end: {endStop}</h4>
-
-      <StopSelector busStops={busStops} id="startStops" onSelectValue={(e) => handleStartStopChange(e)} title="Choose a start station"></StopSelector>
-      <StopSelector busStops={busStops} id="endStops" onSelectValue={(e) => handleEndStopChange(e)} title="Choose a end station"></StopSelector>
-      <button onClick={() => aStarSearch(startStop, endStop)}>TEST BUTTON</button>
-      <button onClick={() => getWeightedAdjacencyList()}>TEST NEW ADJACENCYLIST</button>
-      <div>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <StopSelector busStops={busStops} id="startStops" onSelectValue={(e) => handleStartStopChange(e)} title="Choose a start station"></StopSelector>
+        </Grid>
+        <Grid item xs={12}>
+          <StopSelector busStops={busStops} id="endStops" onSelectValue={(e) => handleEndStopChange(e)} title="Choose a end station"></StopSelector>
+        </Grid>
+        <Grid item xs={12}>
+          <Button variant="contained" color="primary" onClick={() => dijkstraSearch(startStop, endStop)}>TEST BUTTON</Button>
+        </Grid>
+      </Grid>
+      <RouteList routeStops={queriedRoute}></RouteList>
+      {/* <div>
         {queriedRoute.map((r, index) => 
           <p key={index}>{r.vertex} - {r.shortestDistanceFromOrigo} - {r.routeColor}</p>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -3,10 +3,27 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import { CssBaseline } from '@material-ui/core';
+import { lightGreen } from '@material-ui/core/colors';
+
+const themeX = createMuiTheme({
+  palette: {
+    primary: lightGreen,
+    type: "dark",
+    // grey: {
+    //   // 800: "#000000", // overrides failed
+    //   // 900: "#121212" // overrides success
+    // }
+  }
+});
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <MuiThemeProvider theme={themeX}>
+      <CssBaseline />
+      <App />
+    </MuiThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
