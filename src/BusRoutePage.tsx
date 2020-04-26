@@ -279,7 +279,7 @@ const BusRoutePage: FunctionComponent<Props> = props => {
           <Button variant="contained" color="primary" onClick={() => dijkstraSearch(startStop, endStop)}>TEST BUTTON</Button>
         </Grid>
       </Grid>
-      <RouteList routeStops={queriedRoute}></RouteList>
+      <RouteList routeStops={queriedRoute} busRoutes={busRoutes}></RouteList>
       {/* <div>
         {queriedRoute.map((r, index) => 
           <p key={index}>{r.vertex} - {r.shortestDistanceFromOrigo} - {r.routeColor}</p>
