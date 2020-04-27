@@ -1,6 +1,6 @@
 import React from "react";
 import { Vertex, RoutesType } from "../BusRoutePage";
-import { createStyles, makeStyles, Theme, Grid } from "@material-ui/core";
+import { createStyles, makeStyles, Theme, Grid, Divider } from "@material-ui/core";
 import Icon from '@mdi/react'
 import { 
   mdiAlphaACircleOutline,
@@ -21,13 +21,15 @@ import {
   mdiAlphaPCircleOutline,
   mdiAlphaQCircleOutline,
   mdiAlphaRCircleOutline,
-  mdiCircleSmall
+  mdiCircleSmall,
+  mdiTransferDown 
 } from '@mdi/js'
 
 interface Props {
-  routeLeg: Vertex,
+  currentRouteLeg: Vertex,
   index: number,
   busRoutes: RoutesType,
+  routeArray: Vertex[],
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -41,16 +43,11 @@ const useStyles = makeStyles((theme: Theme) =>
       textAlign: 'center',
       color: theme.palette.text.secondary,
     },
-    numberCircle: {
-      borderRadius: "50%",
-      width: "36px",
-      height: "36px",
-      padding: "8px",
-      background: "#fff",
-      border: "2px solid #666",
-      color: "#666",
-      textAlign: "center",
-      font: "32px Arial, sans-serif",
+    vertDivider: {
+      borderLeft: "thick solid #ff0000",
+      width: "1rem",
+      height: "100%"
+      // backgroundColor: "lightgrey",
     }
   }),
 );
@@ -110,9 +107,12 @@ const getIconPath = (routeStop: string) => {
   else if(routeStop === 'R') {
     return mdiAlphaRCircleOutline;
   }
+  else {
+    return mdiAlphaRCircleOutline;
+  }
 }
 
-const getIconColor = (routeLine?:string) => {
+const getIconColor = (routeLine?:string,) => {
   if(routeLine === "keltainen") {
     return "yellow";
   }
@@ -128,26 +128,130 @@ const getIconColor = (routeLine?:string) => {
 }
 
 const RouteLeg: React.FunctionComponent<Props> = props => {
-  const { routeLeg } = props;
+  const { currentRouteLeg, index, routeArray } = props;
   const classes = useStyles();
-  const iconPath = getIconPath(routeLeg.vertex);
-  const iconColor = getIconColor(routeLeg.routeColor);
+  const iconPath = getIconPath(currentRouteLeg.vertex);
+  // First item in array does not have the routeColor-attribute -> so get the color from the second item in array
+  const iconColor = index > 0 ? getIconColor(currentRouteLeg.routeColor) : getIconColor(routeArray[index+1].routeColor);
+
+  // If the currentRouteLeg routeColor is not the same as the previous routeLegs color -> busline change
+  const isLineChange = index > 1 && currentRouteLeg.routeColor !== routeArray[index-1].routeColor; 
+  console.log("routeleg: ", currentRouteLeg.vertex);
+  console.log("islinechange: ", isLineChange);
 
   return (
     <div>
-      <Grid container direction="row">
-        <Grid item xs={12}>
-          {iconPath &&
-            <Icon path={iconPath}
-              title="B"
-              size={2}
-              color={iconColor}
-            />
-          }
+      {/* First item */}
+      {index === 0 && 
+        <>
+          <Grid container direction="row">
+            <Grid item xs={12}>
+              {iconPath &&
+                <Icon path={iconPath}
+                  size={2}
+                  color={iconColor}
+                />
+              }
+            </Grid>
+          </Grid>
+          <Grid container direction="row" alignItems={"center"}>
+            <Grid item xs={1}>
+              <Grid container direction="column">
+                <Grid item xs={4}>
+                  <Icon path={mdiCircleSmall}
+                    size={1}
+                    color={iconColor}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <Icon path={mdiCircleSmall}
+                    size={1}
+                    color={iconColor}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <Icon path={mdiCircleSmall}
+                    size={1}
+                    color={iconColor}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs={11}>
+              Hello number of stops
+            </Grid>
+          </Grid>
+        </>
+      }
+      {isLineChange && 
+      <>
+        <Grid container direction="row">
+          <Grid item xs={12}>
+            {currentRouteLeg.previousVertex &&
+              <Icon path={getIconPath(currentRouteLeg.previousVertex)}
+                size={2}
+                color={getIconColor(routeArray[index-1].routeColor)}
+              />
+            }
+          </Grid>
         </Grid>
-      </Grid>
+        <Grid container direction="row" alignItems={"center"}>
+          <Grid item xs={1}>
+            <Grid container direction="column">
+              <Grid item xs={4}>
+                <Icon path={mdiTransferDown}
+                  size={1}
+                  color={"lightGrey"}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid container direction="row">
+          <Grid item xs={12}>
+            {iconPath &&
+              <Icon path={iconPath}
+                size={2}
+                color={iconColor}
+              />
+            }
+          </Grid>
+        </Grid>
+        {index !== routeArray.length-1 && 
+          <Grid container direction="row" alignItems={"center"}>
+            <Grid item xs={1}>
+              <Grid container direction="column">
+                <Grid item xs={4}>
+                  <Icon path={mdiCircleSmall}
+                    size={1}
+                    color={iconColor}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <Icon path={mdiCircleSmall}
+                    size={1}
+                    color={iconColor}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <Icon path={mdiCircleSmall}
+                    size={1}
+                    color={iconColor}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs={11}>
+              Hello number of stops
+            </Grid>
+          </Grid>
+        }
+        
+      </>
+      }
       
-      <Grid container direction="row">
+      
+      {/* <Grid container direction="row">
         <Grid item xs={1} justify={"center"}>
           <Grid container direction="column">
             <Grid item xs={4}>
@@ -170,16 +274,7 @@ const RouteLeg: React.FunctionComponent<Props> = props => {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={4} justify={"flex-start"}>
-          {routeLeg.vertex}
-        </Grid>
-        <Grid item xs={4}>
-          {routeLeg.shortestDistanceFromOrigo}
-        </Grid>
-        <Grid item xs={3}>
-          {routeLeg.routeColor}
-        </Grid>
-      </Grid>
+      </Grid> */}
     </div>
   )
 }

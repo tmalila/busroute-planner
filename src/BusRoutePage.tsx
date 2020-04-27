@@ -54,8 +54,8 @@ const useStyles = makeStyles((theme: Theme) =>
 const BusRoutePage: FunctionComponent<Props> = props => {
 
   const { busRoads, busRoutes } = props;
-  const [endStop, setEndStop] = useState("");
-  const [startStop, setStartStop] = useState("");
+  const [startStop, setStartStop] = useState("A");
+  const [endStop, setEndStop] = useState("P");
   const [queriedRoute, setQueriedRoute] = useState<Vertex[]>([]);
 
   const classes = useStyles();
@@ -270,10 +270,10 @@ const BusRoutePage: FunctionComponent<Props> = props => {
       <h4>Selected end: {endStop}</h4>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <StopSelector busStops={busStops} id="startStops" onSelectValue={(e) => handleStartStopChange(e)} title="Choose a start station"></StopSelector>
+          <StopSelector busStops={busStops} id="startStops" onSelectValue={(e) => handleStartStopChange(e)} title="Choose a start station" value={startStop}></StopSelector>
         </Grid>
         <Grid item xs={12}>
-          <StopSelector busStops={busStops} id="endStops" onSelectValue={(e) => handleEndStopChange(e)} title="Choose a end station"></StopSelector>
+          <StopSelector busStops={busStops} id="endStops" onSelectValue={(e) => handleEndStopChange(e)} title="Choose a end station" value={endStop}></StopSelector>
         </Grid>
         <Grid item xs={12}>
           <Button variant="contained" color="primary" onClick={() => dijkstraSearch(startStop, endStop)}>TEST BUTTON</Button>

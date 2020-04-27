@@ -11,6 +11,7 @@ interface Props {
   onSelectValue: (event: any) => void,
   id: string,
   title: string,
+  value: string,
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -24,14 +25,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const StopSelector: FunctionComponent<Props> = props => {
-  const { busStops, onSelectValue, title, id } = props;
+  const { busStops, onSelectValue, title, id, value } = props;
   const classes = useStyles();
 
   return (
     <div>
       <FormControl className={classes.formControl}>
         <InputLabel id={"label"+id}>{title}</InputLabel>
-        <Select id={id} required labelId={"label"+id} onChange={(e) => onSelectValue(e)}>
+        <Select id={id} required labelId={"label"+id} onChange={(e) => onSelectValue(e)} value={value}>
           {busStops.map(stop => 
           <MenuItem key={stop} value={stop}>{stop}</MenuItem> 
           )}

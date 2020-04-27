@@ -14,8 +14,8 @@ const RouteList: React.FunctionComponent<Props> = props => {
 
   return (
     <div>
-      {routeStops.map((r, index) => 
-          <RouteLeg routeLeg={r} key={index} index={index} busRoutes={props.busRoutes}></RouteLeg>
+      {routeStops.map((r, index, array) => 
+          <RouteLeg currentRouteLeg={r} key={index} index={index} busRoutes={props.busRoutes} routeArray={array}></RouteLeg>
       )}
     </div>
   )
