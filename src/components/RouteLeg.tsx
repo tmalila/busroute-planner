@@ -48,6 +48,9 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "1rem",
       height: "100%"
       // backgroundColor: "lightgrey",
+    },
+    legInfo: {
+      color: "darkgrey",
     }
   }),
 );
@@ -127,6 +130,16 @@ const getIconColor = (routeLine?:string,) => {
   }
 }
 
+const getStopsInBetweenCount = (currentStopIndex:number, routeArray:Vertex[]) => {
+  let previousStopIndex = currentStopIndex-1;
+  const previousStopColor = routeArray[previousStopIndex].routeColor;
+  console.log("se previous: ", previousStopColor); 
+  while(routeArray[previousStopIndex].routeColor === previousStopColor) {
+    previousStopIndex--;
+  }
+  return (currentStopIndex-previousStopIndex-1).toString();
+}
+
 const RouteLeg: React.FunctionComponent<Props> = props => {
   const { currentRouteLeg, index, routeArray } = props;
   const classes = useStyles();
@@ -136,13 +149,13 @@ const RouteLeg: React.FunctionComponent<Props> = props => {
 
   // If the currentRouteLeg routeColor is not the same as the previous routeLegs color -> busline change
   const isLineChange = index > 1 && currentRouteLeg.routeColor !== routeArray[index-1].routeColor; 
-  console.log("routeleg: ", currentRouteLeg.vertex);
+  console.log("routeleg: ", currentRouteLeg);
   console.log("islinechange: ", isLineChange);
 
   return (
     <div>
       {/* First item */}
-      {index === 0 && 
+      { index === 0 && 
         <>
           <Grid container direction="row">
             <Grid item xs={12}>
@@ -154,7 +167,7 @@ const RouteLeg: React.FunctionComponent<Props> = props => {
               }
             </Grid>
           </Grid>
-          <Grid container direction="row" alignItems={"center"}>
+          {/* <Grid container direction="row" alignItems={"center"}>
             <Grid item xs={1}>
               <Grid container direction="column">
                 <Grid item xs={4}>
@@ -180,10 +193,128 @@ const RouteLeg: React.FunctionComponent<Props> = props => {
             <Grid item xs={11}>
               Hello number of stops
             </Grid>
-          </Grid>
+          </Grid> */}
         </>
       }
-      {isLineChange && 
+
+      {/* Print ... and line info for "middle" legs */}
+      { index > 1 && isLineChange &&
+      <>
+        <Grid container direction="row" alignItems={"center"}>
+          <Grid item xs={1}>
+            <Grid container direction="column">
+              <Grid item xs={4}>
+                <Icon path={mdiCircleSmall}
+                  size={1}
+                  color={getIconColor(routeArray[index-1].routeColor)}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <Icon path={mdiCircleSmall}
+                  size={1}
+                  color={getIconColor(routeArray[index-1].routeColor)}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <Icon path={mdiCircleSmall}
+                  size={1}
+                  color={getIconColor(routeArray[index-1].routeColor)}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item xs={11}>
+            <p className={classes.legInfo}>
+              {getStopsInBetweenCount(index, routeArray)} stops
+            </p>
+          </Grid>
+        </Grid> 
+        <Grid container direction="row">
+          <Grid item xs={12}>
+            {currentRouteLeg.previousVertex &&
+              <Icon path={getIconPath(currentRouteLeg.previousVertex)}
+                size={2}
+                color={getIconColor(routeArray[index-1].routeColor)}
+              />
+            }
+          </Grid>
+        </Grid>
+        { isLineChange &&
+        <>
+          <Grid container direction="row" alignItems={"center"}>
+            <Grid item xs={1}>
+              <Grid container direction="column">
+                <Grid item xs={4}>
+                  <Icon path={mdiTransferDown}
+                    size={1}
+                    color={"lightGrey"}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid container direction="row">
+            <Grid item xs={12}>
+              {currentRouteLeg.previousVertex &&
+                <Icon path={getIconPath(currentRouteLeg.previousVertex)}
+                  size={2}
+                  color={iconColor}
+                />
+              }
+          </Grid>
+        </Grid>
+        </>
+        }
+      </>
+      }
+
+      {/* Print last leg */}
+      { index === routeArray.length-1 &&
+      <>
+        <Grid container direction="row" alignItems={"center"}>
+          <Grid item xs={1}>
+            <Grid container direction="column">
+              <Grid item xs={4}>
+                <Icon path={mdiCircleSmall}
+                  size={1}
+                  color={iconColor}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <Icon path={mdiCircleSmall}
+                  size={1}
+                  color={iconColor}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <Icon path={mdiCircleSmall}
+                  size={1}
+                  color={iconColor}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item xs={11}>
+            <p style={{ color: "darkgrey" }}>
+              10 minutes - 2 stops
+            </p>
+          </Grid>
+        </Grid> 
+        <Grid container direction="row">
+          <Grid item xs={12}>
+            {iconPath &&
+              <Icon path={iconPath}
+                size={2}
+                color={iconColor}
+              />
+            }
+          </Grid>
+        </Grid>
+      </>
+      }
+
+
+      {/* {isLineChange && 
       <>
         <Grid container direction="row">
           <Grid item xs={12}>
@@ -248,7 +379,7 @@ const RouteLeg: React.FunctionComponent<Props> = props => {
         }
         
       </>
-      }
+      } */}
       
       
       {/* <Grid container direction="row">
