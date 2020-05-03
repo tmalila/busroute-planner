@@ -2,7 +2,7 @@
 
 This application chooses the shortest route between two points in a predefined .json-dataset (/src/reittiopas.json) that mimicks a public transport system.
 
-The shortest route between two points is calculated using Dijkstras algorithm. The calculation could easily be ran against a database on predefined intervalls and only the results would then be queried from the frontend. The current solution could also easily be refactored to use a state container such as Redux.
+The shortest route between two points is calculated using Dijkstras algorithm. This is done by creating a weighted adjacency list of the dataset and then running an simple implementation of Dijkstra against the weighted adjacency list. The calculation could easily be ran against a database on predefined intervalls and only the results would then be queried from the frontend. The current solution could also easily be refactored to use a state container such as Redux.
 
 The application is made with React and uses UI-components from Material UI-framework. All packages are installed using yarn and development done using a Windows 64-bit OS.
 
