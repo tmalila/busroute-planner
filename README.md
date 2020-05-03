@@ -1,6 +1,6 @@
 # Busroute planner
 
-This application chooses the shortest route between two points in a predefined .json-dataset that mimicks a public transport system.
+This application chooses the shortest route between two points in a predefined .json-dataset (/src/reittiopas.json) that mimicks a public transport system.
 
 The shortest route between two points is calculated using Dijkstras algorithm. The calculation could easily be ran against a database on predefined intervalls and only the results would then be queried from the frontend. The current solution could also easily be refactored to use a state container such as Redux.
 
