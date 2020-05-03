@@ -66,9 +66,7 @@ const BusRoutePage: FunctionComponent<Props> = props => {
     let visitedNodes: string[] = [];
     let unvisitedNodes: string[] = [];
     
-    // let adjList = getAdjList(); // Working version
-    let adjList = getWeightedAdjacencyList(); // Testing new with routecolors
-    console.log("se adjlist: ", adjList);
+    let adjList = getWeightedAdjacencyList();
 
     // Setup
     let startNode = adjList.get(start);
@@ -110,12 +108,7 @@ const BusRoutePage: FunctionComponent<Props> = props => {
         })
         visitedNodes.push(currentVertex.vertex); // Add current node to already visited list
         unvisitedNodes = unvisitedNodes.filter(n => n !== currentVertex.vertex); // Remove current Node from unvisited-list
-        console.log("Visited: ", visitedNodes);
-        console.log("UnVisited: ", unvisitedNodes);
-        console.log("ResultTable: ", resultTable);
       }
-
-      console.log("Djikstras finished...");
 
       let resStack:Vertex[] = [];
       let endNode = resultTable.find(f => f.vertex === end);
@@ -132,7 +125,6 @@ const BusRoutePage: FunctionComponent<Props> = props => {
       if(resStack && resStack.length > 0) {
         setQueriedRoute(resStack.reverse());
       }
-      // let closestNextNode = getClosestNode(startNode);
     }
   }
 
@@ -142,19 +134,11 @@ const BusRoutePage: FunctionComponent<Props> = props => {
     });
   }
 
-  const getClosestNode = (currentNode: AdjListNode[]) => {
-    return currentNode.reduce(function(prev, curr) {
-      return prev.linkCost < curr.linkCost ? prev : curr;
-    });
-  }
-
   const getWeightedAdjacencyList = () => {
     let adjList = new Map<string, AdjListNode[]>();
 
     for (var route in busRoutes) {
       if (Object.prototype.hasOwnProperty.call(busRoutes, route)) {
-          console.log("se reiti: ", route);
-
           // items[i+1] will always exist inside this loop
           for(var i = 0; i < busRoutes[route].length-1; ++i) {
             const currentStop = busRoutes[route][i];
@@ -207,51 +191,6 @@ const BusRoutePage: FunctionComponent<Props> = props => {
     return adjList;
   }
 
-  // Create weighted adjacency list of roads
-  const getAdjList = () => {
-    let adjList = new Map<string, AdjListNode[]>();
-
-    busRoads.forEach(busStop => {
-      // Add node for Dict[mista].mihin
-      const tempFrom:AdjListNode = {
-        nodeId: busStop.mihin,
-        linkCost: busStop.kesto,
-        routeColor: "TODO"
-      }; 
-      let adjNodes = adjList.get(busStop.mista);
-      // Dict key already exists -> add object to array of values
-      if(adjNodes) {
-        adjNodes.push(tempFrom);
-        adjList.set(busStop.mista, adjNodes);
-      }
-      else {
-        const newArr = [];
-        newArr.push(tempFrom);
-        adjList.set(busStop.mista, newArr)
-      }
-
-      // Add node for Dict[mihin].mista
-      const tempTo:AdjListNode = {
-        nodeId: busStop.mista,
-        linkCost: busStop.kesto,
-        routeColor: "TODO",
-      }; 
-      let adjNodes2 = adjList.get(busStop.mihin);
-      // Dict key already exists -> add object to array of values
-      if(adjNodes2) {
-        adjNodes2.push(tempTo);
-        adjList.set(busStop.mihin, adjNodes2);
-      }
-      else {
-        const newArr = [];
-        newArr.push(tempTo);
-        adjList.set(busStop.mihin, newArr)
-      }
-    })
-    return adjList;
-  }
-
-
   const handleEndStopChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     var target = e.target as HTMLSelectElement;
     setEndStop(target.value);
@@ -265,18 +204,15 @@ const BusRoutePage: FunctionComponent<Props> = props => {
   const { busStops } = props;
   return (
     <div className={classes.root}>
-      <h2>Hello busroutepage</h2>
-      <h4>Selected start: {startStop}</h4>
-      <h4>Selected end: {endStop}</h4>
-      <Grid container spacing={2}>
+      <Grid container>
         <Grid item xs={12}>
-          <StopSelector busStops={busStops} id="startStops" onSelectValue={(e) => handleStartStopChange(e)} title="Choose a start station" value={startStop}></StopSelector>
+          <StopSelector busStops={busStops.filter(f => f !== endStop)} id="startStops" onSelectValue={(e) => handleStartStopChange(e)} title="Choose a start station" value={startStop}></StopSelector>
         </Grid>
         <Grid item xs={12}>
-          <StopSelector busStops={busStops} id="endStops" onSelectValue={(e) => handleEndStopChange(e)} title="Choose a end station" value={endStop}></StopSelector>
+          <StopSelector busStops={busStops.filter(f => f !== startStop)} id="endStops" onSelectValue={(e) => handleEndStopChange(e)} title="Choose an end station" value={endStop}></StopSelector>
         </Grid>
-        <Grid item xs={12}>
-          <Button variant="contained" color="primary" onClick={() => dijkstraSearch(startStop, endStop)}>TEST BUTTON</Button>
+        <Grid item xs={12} style={{ marginTop: "1rem" }}>
+          <Button variant="contained" color="primary" onClick={() => dijkstraSearch(startStop, endStop)}>SEARCH</Button>
         </Grid>
       </Grid>
       <RouteList routeStops={queriedRoute} busRoutes={busRoutes}></RouteList>

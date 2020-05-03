@@ -51,6 +51,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     legInfo: {
       color: "darkgrey",
+    },
+    legDot: {
+      textAlign: "center",
     }
   }),
 );
@@ -126,31 +129,66 @@ const getIconColor = (routeLine?:string,) => {
     return "green";
   }
   else if(routeLine === "sininen") {
-    return "cyan";
+    return "dodgerblue";
   }
 }
 
 const getStopsInBetweenCount = (currentStopIndex:number, routeArray:Vertex[]) => {
   let previousStopIndex = currentStopIndex-1;
   const previousStopColor = routeArray[previousStopIndex].routeColor;
-  console.log("se previous: ", previousStopColor); 
   while(routeArray[previousStopIndex].routeColor === previousStopColor) {
     previousStopIndex--;
   }
   return (currentStopIndex-previousStopIndex-1).toString();
 }
 
+const getTimeInBetween = (currentStopIndex: number, routeArray: Vertex[]) => {
+  let previousStopIndex = currentStopIndex-1;
+  const previousStopColor = routeArray[previousStopIndex].routeColor;
+  let minutesStart = routeArray[previousStopIndex].shortestDistanceFromOrigo;
+  while(routeArray[previousStopIndex].routeColor === previousStopColor) {
+    previousStopIndex--;
+  }
+  let minutesEnd = routeArray[previousStopIndex].shortestDistanceFromOrigo;
+  let minutes = (minutesStart - minutesEnd);
+
+  return minutes.toString();
+}
+
+const getStopsInBetweenForLastLeg = (currentStopIndex: number, routeArray: Vertex[]) => {
+  // Check if route has any line-changes
+  const currentLegColor = routeArray[currentStopIndex].routeColor;
+  if(routeArray.slice(1).every(l => l.routeColor === currentLegColor)) {
+    return routeArray.length-1;
+  }
+  else {
+    // getStopsInBetweenCount actually checks stops in between for previous node because of change UI-rendering. +1 is a hack for actually checking the current stop
+    return getStopsInBetweenCount(currentStopIndex+1, routeArray);
+  }
+}
+
+const getTimeInBetweenForLastLeg = (currentStopIndex: number, routeArray: Vertex[]) => {
+  // Check if route has any line-changes
+  const currentLeg = routeArray[currentStopIndex];
+  if(routeArray.slice(1).every(l => l.routeColor === currentLeg.routeColor)) {
+    return currentLeg.shortestDistanceFromOrigo;
+  }
+  else {
+    // getTimeInBetween actually checks time for previous node because of change UI-rendering. +1 is a hack for actually checking the current stop
+    return getTimeInBetween(currentStopIndex+1, routeArray);
+  }
+}
+
 const RouteLeg: React.FunctionComponent<Props> = props => {
   const { currentRouteLeg, index, routeArray } = props;
   const classes = useStyles();
   const iconPath = getIconPath(currentRouteLeg.vertex);
+
   // First item in array does not have the routeColor-attribute -> so get the color from the second item in array
   const iconColor = index > 0 ? getIconColor(currentRouteLeg.routeColor) : getIconColor(routeArray[index+1].routeColor);
 
   // If the currentRouteLeg routeColor is not the same as the previous routeLegs color -> busline change
   const isLineChange = index > 1 && currentRouteLeg.routeColor !== routeArray[index-1].routeColor; 
-  console.log("routeleg: ", currentRouteLeg);
-  console.log("islinechange: ", isLineChange);
 
   return (
     <div>
@@ -167,33 +205,6 @@ const RouteLeg: React.FunctionComponent<Props> = props => {
               }
             </Grid>
           </Grid>
-          {/* <Grid container direction="row" alignItems={"center"}>
-            <Grid item xs={1}>
-              <Grid container direction="column">
-                <Grid item xs={4}>
-                  <Icon path={mdiCircleSmall}
-                    size={1}
-                    color={iconColor}
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <Icon path={mdiCircleSmall}
-                    size={1}
-                    color={iconColor}
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <Icon path={mdiCircleSmall}
-                    size={1}
-                    color={iconColor}
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={11}>
-              Hello number of stops
-            </Grid>
-          </Grid> */}
         </>
       }
 
@@ -203,19 +214,19 @@ const RouteLeg: React.FunctionComponent<Props> = props => {
         <Grid container direction="row" alignItems={"center"}>
           <Grid item xs={1}>
             <Grid container direction="column">
-              <Grid item xs={4}>
+              <Grid item xs={4} className={classes.legDot}>
                 <Icon path={mdiCircleSmall}
                   size={1}
                   color={getIconColor(routeArray[index-1].routeColor)}
                 />
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={4} className={classes.legDot}>
                 <Icon path={mdiCircleSmall}
                   size={1}
                   color={getIconColor(routeArray[index-1].routeColor)}
                 />
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={4} className={classes.legDot}>
                 <Icon path={mdiCircleSmall}
                   size={1}
                   color={getIconColor(routeArray[index-1].routeColor)}
@@ -225,7 +236,7 @@ const RouteLeg: React.FunctionComponent<Props> = props => {
           </Grid>
           <Grid item xs={11}>
             <p className={classes.legInfo}>
-              {getStopsInBetweenCount(index, routeArray)} stops
+              {getStopsInBetweenCount(index, routeArray)} stops - {getTimeInBetween(index, routeArray)} minutes
             </p>
           </Grid>
         </Grid> 
@@ -244,10 +255,10 @@ const RouteLeg: React.FunctionComponent<Props> = props => {
           <Grid container direction="row" alignItems={"center"}>
             <Grid item xs={1}>
               <Grid container direction="column">
-                <Grid item xs={4}>
+                <Grid item xs={4} className={classes.legDot}>
                   <Icon path={mdiTransferDown}
                     size={1}
-                    color={"lightGrey"}
+                    color={"darkgrey"}
                   />
                 </Grid>
               </Grid>
@@ -274,19 +285,19 @@ const RouteLeg: React.FunctionComponent<Props> = props => {
         <Grid container direction="row" alignItems={"center"}>
           <Grid item xs={1}>
             <Grid container direction="column">
-              <Grid item xs={4}>
+              <Grid item xs={4} className={classes.legDot}>
                 <Icon path={mdiCircleSmall}
                   size={1}
                   color={iconColor}
                 />
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={4} className={classes.legDot}>
                 <Icon path={mdiCircleSmall}
                   size={1}
                   color={iconColor}
                 />
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={4} className={classes.legDot}>
                 <Icon path={mdiCircleSmall}
                   size={1}
                   color={iconColor}
@@ -296,7 +307,7 @@ const RouteLeg: React.FunctionComponent<Props> = props => {
           </Grid>
           <Grid item xs={11}>
             <p style={{ color: "darkgrey" }}>
-              10 minutes - 2 stops
+              {getStopsInBetweenForLastLeg(index, routeArray)} stops - {getTimeInBetweenForLastLeg(index, routeArray)} minutes
             </p>
           </Grid>
         </Grid> 
@@ -312,100 +323,6 @@ const RouteLeg: React.FunctionComponent<Props> = props => {
         </Grid>
       </>
       }
-
-
-      {/* {isLineChange && 
-      <>
-        <Grid container direction="row">
-          <Grid item xs={12}>
-            {currentRouteLeg.previousVertex &&
-              <Icon path={getIconPath(currentRouteLeg.previousVertex)}
-                size={2}
-                color={getIconColor(routeArray[index-1].routeColor)}
-              />
-            }
-          </Grid>
-        </Grid>
-        <Grid container direction="row" alignItems={"center"}>
-          <Grid item xs={1}>
-            <Grid container direction="column">
-              <Grid item xs={4}>
-                <Icon path={mdiTransferDown}
-                  size={1}
-                  color={"lightGrey"}
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid container direction="row">
-          <Grid item xs={12}>
-            {iconPath &&
-              <Icon path={iconPath}
-                size={2}
-                color={iconColor}
-              />
-            }
-          </Grid>
-        </Grid>
-        {index !== routeArray.length-1 && 
-          <Grid container direction="row" alignItems={"center"}>
-            <Grid item xs={1}>
-              <Grid container direction="column">
-                <Grid item xs={4}>
-                  <Icon path={mdiCircleSmall}
-                    size={1}
-                    color={iconColor}
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <Icon path={mdiCircleSmall}
-                    size={1}
-                    color={iconColor}
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <Icon path={mdiCircleSmall}
-                    size={1}
-                    color={iconColor}
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={11}>
-              Hello number of stops
-            </Grid>
-          </Grid>
-        }
-        
-      </>
-      } */}
-      
-      
-      {/* <Grid container direction="row">
-        <Grid item xs={1} justify={"center"}>
-          <Grid container direction="column">
-            <Grid item xs={4}>
-              <Icon path={mdiCircleSmall}
-                size={1}
-                color="lightgrey"
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <Icon path={mdiCircleSmall}
-                size={1}
-                color="lightgrey"
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <Icon path={mdiCircleSmall}
-                size={1}
-                color="lightgrey"
-              />
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid> */}
     </div>
   )
 }

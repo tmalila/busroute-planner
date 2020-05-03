@@ -13,10 +13,17 @@ const RouteList: React.FunctionComponent<Props> = props => {
   const { routeStops } = props;
 
   return (
-    <div>
-      {routeStops.map((r, index, array) => 
-          <RouteLeg currentRouteLeg={r} key={index} index={index} busRoutes={props.busRoutes} routeArray={array}></RouteLeg>
-      )}
+    <div style={{ marginTop: "1rem" }}>
+      {routeStops && routeStops.length > 0 &&
+        (
+          <>
+          {routeStops.map((r, index, array) => 
+            <RouteLeg currentRouteLeg={r} key={index} index={index} busRoutes={props.busRoutes} routeArray={array}></RouteLeg>
+          )}
+          <p>Total route time {routeStops[routeStops.length-1].shortestDistanceFromOrigo} minutes</p>
+          </>
+        )
+      }
     </div>
   )
 }

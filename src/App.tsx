@@ -4,6 +4,7 @@ import './App.css';
 import BusRoutePage from './BusRoutePage';
 import reittiopas from './reittiopas.json';
 import { Grid, makeStyles } from '@material-ui/core';
+import Header from './components/Header';
 
 function App() {
   const busStops = reittiopas.pysakit;
@@ -27,6 +28,7 @@ function App() {
           Learn React
         </a>
       </header> */}
+      <Header title="Busroute planner"></Header>
       <BusRoutePage busStops={busStops} busRoads={busRoads} busRoutes={busRoutes}></BusRoutePage>
       {/* </Grid> */}
     </div>
